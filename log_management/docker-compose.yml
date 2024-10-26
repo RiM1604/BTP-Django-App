@@ -1,0 +1,46 @@
+
+version: '3'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    environment:
+      - discovery.type=single-node
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - elasticsearch
+      - redis
+    environment:
+      - BLOCKCHAIN_NODE_URL=http://your-ethereum-node:8545
+      - CONTRACT_ADDRESS=your-contract-address
+      - PRIVATE_KEY=your-private-key
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  celery:
+    build: .
+    command: celery -A log_management worker -l info
+    volumes:
+      - .:/code
+    depends_on:
+      - redis
+      - web
+
+volumes:
+  elasticsearch_data:

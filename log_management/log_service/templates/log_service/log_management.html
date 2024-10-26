@@ -1,0 +1,88 @@
+<!-- log_service/templates/log_service/log_management.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Ingest Log Form -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Ingest Log</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ ingest_form.timestamp.id_for_label }}" class="form-label">Timestamp:</label>
+                            {{ ingest_form.timestamp }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ ingest_form.service_name.id_for_label }}" class="form-label">Service Name:</label>
+                            {{ ingest_form.service_name }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ ingest_form.log_content.id_for_label }}" class="form-label">Log Content:</label>
+                            {{ ingest_form.log_content }}
+                        </div>
+                        <button type="submit" name="ingest_log" class="btn btn-primary">Submit Log</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Query Logs Form -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Query Logs</h3>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ query_form.start_time.id_for_label }}" class="form-label">Start Time:</label>
+                            {{ query_form.start_time }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ query_form.end_time.id_for_label }}" class="form-label">End Time:</label>
+                            {{ query_form.end_time }}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ query_form.service_name.id_for_label }}" class="form-label">Service Name:</label>
+                            {{ query_form.service_name }}
+                        </div>
+                        <button type="submit" name="query_logs" class="btn btn-primary">Query Logs</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Query Results -->
+    {% if query_results %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Query Results</h3>
+                </div>
+                <div class="card-body">
+                    <pre class="bg-light p-3">{{ query_results|pprint }}</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
